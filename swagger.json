@@ -68,6 +68,76 @@
         }
       }
     },
+    "/api/token": {
+      "post": {
+        "summary": "Get access token from Keycloak",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "required": ["grant_type", "client_id", "client_secret"],
+                "properties": {
+                  "grant_type": {
+                    "type": "string",
+                    "enum": ["client_credentials"],
+                    "default": "client_credentials"
+                  },
+                  "client_id": {
+                    "type": "string",
+                    "example": "test"
+                  },
+                  "client_secret": {
+                    "type": "string",
+                    "example": "your-client-secret"
+                  },
+                  "scope": {
+                    "type": "string",
+                    "example": "tickets.read_only tickets.write"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token response from Keycloak",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": {
+                      "type": "string"
+                    },
+                    "expires_in": {
+                      "type": "integer"
+                    },
+                    "refresh_expires_in": {
+                      "type": "integer"
+                    },
+                    "token_type": {
+                      "type": "string"
+                    },
+                    "scope": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Invalid client credentials"
+          }
+        }
+      }
+    },
     "/api/v3/requests": {
       "get": {
         "summary": "Get list of requests",

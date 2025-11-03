@@ -103,6 +103,41 @@ def get_token(scope = None):
 
 """--- Rest APIs start ---"""
 
+@app.post('/api/token')
+def get_token_from_keycloak():
+    """Proxy endpoint for Keycloak token requests"""
+    try:
+        # Forward the request to Keycloak
+        keycloak_token_url = f"{KEYCLOAK_AUTH_URL}/protocol/openid-connect/token"
+        
+        # Get data from form or JSON
+        data = {}
+        if request.form:
+            data = request.form.to_dict()
+        else:
+            try:
+                data = request.get_json() or {}
+            except Exception:
+                data = {}
+
+        # Forward the token request to Keycloak
+        response = requests.post(
+            keycloak_token_url,
+            data=data,
+            headers={
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            verify=False  # Since we're using verify=False elsewhere
+        )
+
+        # Return the response from Keycloak
+        return jsonify(response.json()), response.status_code
+    except Exception as e:
+        return jsonify({
+            'error': 'token_error',
+            'error_description': str(e)
+        }), 500
+
 @app.get('/api/v3/requests/<id>')
 @require_keycloak(['tickets.read_only', 'tickets.write'])
 def get_request_by_id(id):
