@@ -1,4 +1,4 @@
-from flask import Flask, request, make_response, jsonify
+from flask import Flask, request, make_response, jsonify, send_file
 from authlib.oauth2.rfc6750 import BearerTokenValidator, InvalidTokenError, InsufficientScopeError
 from authlib.oauth2.rfc6749 import OAuth2Token
 from authlib.integrations.requests_client import OAuth2Session
@@ -9,6 +9,8 @@ from authlib.jose import jwt, jwk, JsonWebKey, JoseError
 
 import json
 import requests
+import os
+import time
 
 """--- Steup Flask start ---"""
 
@@ -30,7 +32,7 @@ class KeycloakTokenValidator(BearerTokenValidator):
         self.public_keys = self.fetch_public_keys()
 
     def fetch_public_keys(self):
-        response = requests.get(KEYCLOAK_CERTS_URL,verify=False)
+        response = requests.get(KEYCLOAK_CERTS_URL, verify=False)
         if response.status_code != 200:
             raise Exception('Failed to fetch public keys from Keycloak', response.text)
 
@@ -39,7 +41,6 @@ class KeycloakTokenValidator(BearerTokenValidator):
 
     def authenticate_token(self, token_string):
         try:
-            # Decode and verify the JWT token using the public keys
             claims = jwt.decode(token_string, self.public_keys)
             claims.validate()
             return OAuth2Token(claims)
@@ -183,3 +184,14 @@ def handle_exception(e):
     return response
 
 """--- Rest APIs end ---"""
+
+@app.route('/api/docs')
+def swagger_json():
+    return send_file('swagger.json')
+
+@app.route('/')
+def swagger_ui():
+    return send_file('static/index.html')
+
+
+
