@@ -175,44 +175,40 @@ def update_request(id):
 @app.post('/api/v3/requests/<id>/_uploads')
 @require_keycloak('tickets.write')
 def upload_request_attachment(id):
-    """Upload one or more attachments to a request"""
+    """Upload attachment to a request"""
 
     scope = "SDPOnDemand.requests.WRITE"
-    token = get_token(scope)
-    access_token = token['access_token']
 
-    # Base URL for Zoho API
-    base_url = f"https://sdpondemand.manageengine.com/app/itdesk/api/v3/requests/{id}/_uploads"
+    token = get_token(scope)
+
+    # Forward headers and files to Zoho API
+    access_token = token['access_token']
+    url = f"https://sdpondemand.manageengine.com/app/itdesk/api/v3/requests/{id}/_uploads"
+
+    # Use 'requests' directly since this is multipart/form-data
+    files = {}
+    if 'filename' in request.files:
+        file_obj = request.files['filename']
+        files['filename'] = (file_obj.filename, file_obj.stream, file_obj.mimetype)
+    
+    data = {
+        'addtoattachment': request.form.get('addtoattachment', 'true')
+    }
 
     headers = {
         'Authorization': f'Zoho-oauthtoken {access_token}',
         'Accept': 'application/vnd.manageengine.sdp.v3+json'
     }
 
-    results = []
-    files_list = request.files.getlist('filename')
-    addtoattachment = request.form.get('addtoattachment', 'true')
+    resp = requests.post(url, headers=headers, files=files, data=data)
 
-    # Loop through all uploaded files and send individually
-    for file_obj in files_list:
-        files = {
-            'filename': (file_obj.filename, file_obj.stream, file_obj.mimetype)
-        }
-        data = {'addtoattachment': addtoattachment}
+    flask_resp = make_response(resp.content, resp.status_code)
+    for name, value in resp.headers.items():
+        if name.lower() in ['content-encoding', 'transfer-encoding', 'content-length']:
+            continue
+        flask_resp.headers[name] = value
 
-        resp = requests.post(base_url, headers=headers, files=files, data=data)
-        try:
-            results.append(resp.json())
-        except Exception:
-            results.append({'status_code': resp.status_code, 'response': resp.text})
-
-    # Return combined results
-    return jsonify({
-        'uploaded': results,
-        'count': len(results)
-    }), 200
-
-
+    return flask_resp
 
 def proxy_zoho_api(scope):
     """Proxy the request by using OAuth2 client to request the ZoHo API"""
@@ -270,8 +266,11 @@ def handle_exception(e):
 
 @app.route('/api/docs')
 def swagger_json():
-    return send_file('swagger_test.json')
+    return send_file('swagger.json')
 
 @app.route('/')
 def swagger_ui():
     return send_file('static/index.html')
+
+
+

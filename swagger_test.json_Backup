@@ -1,0 +1,60 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "3.0",
+    "title": "ManageEngine ServiceDesk Plus API"
+  },
+  "host": "51.21.81.193:5555",
+  "basePath": "/api/v3",
+  "schemes": ["http"],
+  "paths": {
+    "/requests": {
+      "post": {
+        "summary": "Create Request",
+        "description": "Create a new request via form-urlencoded input_data JSON payload.",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/vnd.manageengine.sdp.v3+json"
+        ],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "input_data",
+            "description": "JSON string of request data",
+            "required": true,
+            "type": "string",
+            "example": "{\n  \"request\": {\n    \"template\": {\"id\": \"228538000000542001\"},\n    \"requester\": {\"name\": \"emillearns@gmail.com\"},\n    \"site\": {\"name\": \"Base Site\"},\n    \"request_type\": {\"name\": \"Incident\"},\n    \"priority\": {\"name\": \"High\"},\n    \"status\": {\"name\": \"Open\"},\n    \"category\": {\"name\": \"Fiber\"},\n    \"mode\": {\"name\": \"E-Mail\"},\n    \"subcategory\": {\"name\": \"Outage\"},\n    \"group\": {\"name\": \"App Development\"},\n    \"technician\": {\"name\": \"emillearns@gmail.com\"},\n    \"subject\": \"Test using Swagger\",\n    \"description\": \"Test ticket\"\n  }\n}"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "description": "Bearer token for authentication",
+            "default": "Bearer <your-token>"
+          },
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string",
+            "required": true,
+            "default": "application/vnd.manageengine.sdp.v3+json"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Request created successfully"
+          },
+          "400": {
+            "description": "Bad Request - Invalid or missing input_data"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid token"
+          }
+        }
+      }
+    }
+  }
+}

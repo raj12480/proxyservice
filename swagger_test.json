@@ -1,0 +1,301 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "3.0",
+    "title": "ManageEngine ServiceDesk Plus API"
+  },
+  "host": "51.21.81.193:5555",
+  "basePath": "/api",
+  "schemes": ["http"],
+  "paths": {
+    "/token": {
+      "post": {
+        "summary": "Generate Access Token",
+        "description": "Obtain an OAuth2 access token using the client credentials flow.",
+        "consumes": ["application/x-www-form-urlencoded"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "grant_type",
+            "type": "string",
+            "required": true,
+            "default": "client_credentials",
+            "description": "OAuth2 grant type"
+          },
+          {
+            "in": "formData",
+            "name": "client_id",
+            "type": "string",
+            "required": true,
+            "default": "test",
+            "description": "Client ID issued by the authorization server"
+          },
+          {
+            "in": "formData",
+            "name": "client_secret",
+            "type": "string",
+            "required": true,
+            "default": "VBVfm8H5WXdqKIgiiP3BdDuKqXgdJoWl",
+            "description": "Client secret issued by the authorization server"
+          },
+          {
+            "in": "formData",
+            "name": "scope",
+            "type": "string",
+            "required": true,
+            "default": "tickets.read_only tickets.write",
+            "description": "Requested scopes"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Access token generated successfully" },
+          "400": { "description": "Invalid request parameters" },
+          "401": { "description": "Unauthorized - Invalid client credentials" }
+        }
+      }
+    },
+    "/v3/requests": {
+      "get": {
+        "summary": "List Requests",
+        "description": "Retrieve a list of requests.",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "type": "string",
+            "required": true,
+            "default": "*/*",
+            "description": "Accepted response format"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "default": "Bearer <your-token>",
+            "description": "Bearer token for authentication"
+          }
+        ],
+        "responses": {
+          "200": { "description": "List of requests retrieved successfully" },
+          "401": { "description": "Unauthorized - Invalid token" }
+        }
+      },
+      "post": {
+        "summary": "Create Request",
+        "description": "Create a new request using a JSON payload wrapped in form-urlencoded format.",
+        "consumes": ["application/x-www-form-urlencoded"],
+        "produces": ["application/vnd.manageengine.sdp.v3+json"],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "input_data",
+            "description": "JSON string of request data",
+            "required": true,
+            "type": "string",
+            "schema": {
+              "$ref": "#/definitions/RequestSchema"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "description": "Bearer token for authentication",
+            "default": "Bearer <your-token>"
+          },
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string",
+            "required": true,
+            "default": "application/vnd.manageengine.sdp.v3+json"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Request created successfully" },
+          "400": { "description": "Bad Request - Invalid or missing input_data" },
+          "401": { "description": "Unauthorized - Invalid token" }
+        }
+      }
+    },
+    "/v3/requests/{request_id}": {
+      "get": {
+        "summary": "Get Request by ID",
+        "description": "Retrieve a specific request by its ID.",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The unique ID of the request to retrieve"
+          },
+          {
+            "in": "header",
+            "name": "accept",
+            "type": "string",
+            "required": true,
+            "default": "*/*"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "default": "Bearer <your-token>",
+            "description": "Bearer token for authentication"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Request details retrieved successfully" },
+          "401": { "description": "Unauthorized - Invalid token" },
+          "404": { "description": "Request not found" }
+        }
+      },
+      "put": {
+        "summary": "Update Request",
+        "description": "Update an existing request by ID using a form-urlencoded JSON payload.",
+        "consumes": ["application/x-www-form-urlencoded"],
+        "produces": ["application/vnd.manageengine.sdp.v3+json"],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The unique ID of the request to update"
+          },
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string",
+            "required": true,
+            "default": "application/vnd.manageengine.sdp.v3+json"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "description": "Bearer token for authentication",
+            "default": "Bearer <your-token>"
+          },
+          {
+            "in": "formData",
+            "name": "input_data",
+            "required": true,
+            "type": "string",
+            "schema": {
+              "$ref": "#/definitions/RequestSchema"
+            },
+            "description": "JSON string of updated request data"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Request updated successfully" },
+          "400": { "description": "Bad Request - Invalid or missing input_data" },
+          "401": { "description": "Unauthorized - Invalid token" },
+          "404": { "description": "Request not found" }
+        }
+      }
+    },
+    "/v3/requests/{request_id}/_uploads": {
+      "post": {
+        "summary": "Upload Attachments to a Request",
+        "description": "Upload one or more attachment files to a specific request.",
+        "consumes": ["multipart/form-data"],
+        "produces": ["application/vnd.manageengine.sdp.v3+json"],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The unique ID of the request to upload files to"
+          },
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string",
+            "required": true,
+            "default": "application/vnd.manageengine.sdp.v3+json"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "default": "Bearer <your-token>",
+            "description": "Bearer token for authentication"
+          },
+          {
+            "in": "formData",
+            "name": "filename",
+            "type": "file",
+            "required": true,
+            "description": "Files to upload",
+            "x-multi-files": true
+          },
+          {
+            "in": "formData",
+            "name": "addtoattachment",
+            "type": "string",
+            "required": false,
+            "default": "true",
+            "description": "Whether to add the uploaded file(s) as attachments"
+          }
+        ],
+        "responses": {
+          "200": { "description": "File(s) uploaded successfully" },
+          "400": { "description": "Bad Request - Invalid or missing file(s)" },
+          "401": { "description": "Unauthorized - Invalid token" },
+          "404": { "description": "Request not found" }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "RequestSchema": {
+      "type": "object",
+      "properties": {
+        "request": {
+          "type": "object",
+          "properties": {
+            "template": { "type": "object", "properties": { "id": { "type": "string" } } },
+            "request_template_task_ids": { "type": "array", "items": { "type": "string" } },
+            "requester": { "type": "object", "properties": { "name": { "type": "string" } } },
+            "site": { "type": "object", "properties": { "name": { "type": "string" } } },
+            "request_type": { "type": "object", "properties": { "name": { "type": "string" } } },
+            "priority": { "type": "object", "properties": { "name": { "type": "string" } } },
+            "status": { "type": "object", "properties": { "name": { "type": "string" } } },
+            "category": { "type": "object", "properties": { "name": { "type": "string" } } },
+            "mode": { "type": "object", "properties": { "name": { "type": "string" } } },
+            "subcategory": { "type": "object", "properties": { "name": { "type": "string" } } },
+            "group": { "type": "object", "properties": { "name": { "type": "string" } } },
+            "technician": { "type": "object", "properties": { "name": { "type": "string" } } },
+            "udf_fields": {
+              "type": "object",
+              "properties": {
+                "udf_char21": { "type": "string" },
+                "udf_char27": { "type": "string" },
+                "udf_char22": { "type": "string" },
+                "udf_char23": { "type": "string" },
+                "udf_char24": { "type": "string" },
+                "udf_char26": { "type": "string" }
+              }
+            },
+            "subject": { "type": "string" },
+            "description": { "type": "string" },
+            "attachments": { "type": "array", "items": { "type": "string" } },
+            "resolution": { "type": "object", "properties": { "content": { "type": "string" } } }
+          }
+        }
+      }
+    }
+  }
+}

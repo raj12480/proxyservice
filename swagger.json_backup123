@@ -1,0 +1,162 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Proxy Service API",
+    "description": "API for proxying requests between Keycloak and ZoHo",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://51.21.81.193:5555",
+      "description": "Production server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "paths": {
+    "/api/v3/requests/{id}": {
+      "get": {
+        "summary": "Get request by ID",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Successful response" }
+        }
+      },
+      "put": {
+        "summary": "Update request by ID",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Successful response" }
+        }
+      }
+    },
+    "/api/token": {
+      "post": {
+        "summary": "Get access token from Keycloak",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "required": ["grant_type", "client_id", "client_secret"],
+                "properties": {
+                  "grant_type": {
+                    "type": "string",
+                    "enum": ["client_credentials"],
+                    "default": "client_credentials"
+                  },
+                  "client_id": { "type": "string", "example": "test" },
+                  "client_secret": { "type": "string", "example": "your-client-secret" },
+                  "scope": {
+                    "type": "string",
+                    "example": "tickets.read_only tickets.write"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token response from Keycloak",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": { "type": "string" },
+                    "expires_in": { "type": "integer" },
+                    "refresh_expires_in": { "type": "integer" },
+                    "token_type": { "type": "string" },
+                    "scope": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid request" },
+          "401": { "description": "Invalid client credentials" }
+        }
+      }
+    },
+    "/api/v3/requests": {
+      "get": {
+        "summary": "Get list of requests",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": { "description": "Successful response" }
+        }
+      },
+      "post": {
+        "summary": "Create a new request (application/x-www-form-urlencoded)",
+        "description": "Creates a request using the ManageEngine ServiceDesk Plus API. This matches the working curl where the payload is sent as URL-encoded form data with a single 'input_data' parameter containing a JSON string.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input_data": {
+                    "type": "string",
+                    "description": "JSON string containing the request data (escaped as in the curl command)"
+                  }
+                },
+                "required": ["input_data"]
+              },
+              "example": {
+                "input_data": "{\"request\":{\"template\":{\"id\":\"24812000000281384\"},\"request_template_task_ids\":[],\"request_type\":{\"name\":\"Incident\"},\"impact\":{\"name\":\"Medium\"},\"status\":{\"name\":\"Open\"},\"impact_details\":\"test\",\"mode\":{\"name\":\"E-Mail\"},\"urgency\":{\"name\":\"Urgent\"},\"level\":{\"name\":\"Tier 1\"},\"priority\":{\"name\":\"High\"},\"category\":{\"name\":\"Software\"},\"group\":{\"name\":\"Hardware Problems\"},\"requester\":{\"email_id\":\"patelraj0824@gmail.com\"},\"subcategory\":null,\"item\":null,\"subject\":\"Test ticket with Kishan\",\"description\":\"This is a test ticket created via API\",\"email_ids_to_notify\":[],\"resolution\":{\"content\":null},\"created_time\":null,\"due_by_time\":null,\"first_response_due_by_time\":null,\"attachments\":[]}}"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Ticket created successfully" },
+          "400": { "description": "Invalid request or missing input_data" },
+          "401": { "description": "Unauthorized - Invalid token" },
+          "415": { "description": "Unsupported media type - Ensure Content-Type is application/x-www-form-urlencoded" }
+        }
+      }
+    }
+  }
+}
