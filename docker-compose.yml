@@ -4,5 +4,5 @@ services:
   proxyservice_new_doc:
     build: .
     ports:
-      - "5555:5000"
+      - "5000:5000"
     restart: unless-stopped

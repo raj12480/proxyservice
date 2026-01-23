@@ -1,224 +1,301 @@
 {
-  "openapi": "3.0.1",
+  "swagger": "2.0",
   "info": {
-    "title": "Keycloak–Zoho Proxy API",
-    "description": "Proxy between Keycloak authentication and Zoho ServiceDesk API.\n\nUse `/api/token` to obtain a Keycloak access token, then use that token with the `/api/v3/requests` endpoints.",
-    "version": "1.0.1"
+    "version": "3.0",
+    "title": "ManageEngine ServiceDesk Plus API"
   },
-  "servers": [
-    {
-      "url": "http://51.21.81.193:5555",
-      "description": "Production Server"
-    }
-  ],
-  "components": {
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
-      }
-    },
-    "schemas": {
-      "KeycloakTokenRequest": {
-        "type": "object",
-        "properties": {
-          "grant_type": { "type": "string", "example": "client_credentials" },
-          "client_id": { "type": "string", "example": "test" },
-          "client_secret": { "type": "string", "example": "VBVfm8H5WXdqKIgiiP3BdDuKqXgdJoWl" },
-          "scope": { "type": "string", "example": "tickets.read_only tickets.write" }
-        }
-      },
-      "CreateRequest": {
-        "type": "object",
-        "properties": {
-          "request": {
-            "type": "object",
-            "properties": {
-              "template": { "type": "object", "properties": { "id": { "type": "string" } } },
-              "requester": { "type": "object", "properties": { "name": { "type": "string" } } },
-              "site": { "type": "object", "properties": { "name": { "type": "string" } } },
-              "request_type": { "type": "object", "properties": { "name": { "type": "string" } } },
-              "priority": { "type": "object", "properties": { "name": { "type": "string" } } },
-              "status": { "type": "object", "properties": { "name": { "type": "string" } } },
-              "category": { "type": "object", "properties": { "name": { "type": "string" } } },
-              "mode": { "type": "object", "properties": { "name": { "type": "string" } } },
-              "subcategory": { "type": "object", "properties": { "name": { "type": "string" } } },
-              "group": { "type": "object", "properties": { "name": { "type": "string" } } },
-              "technician": { "type": "object", "properties": { "name": { "type": "string" } } },
-              "subject": { "type": "string" },
-              "description": { "type": "string" }
-            },
-            "required": ["requester", "subject", "description"]
-          }
-        },
-        "example": {
-          "request": {
-            "template": { "id": "228538000000542001" },
-            "requester": { "name": "emillearns@gmail.com" },
-            "site": { "name": "Base Site" },
-            "request_type": { "name": "Incident" },
-            "priority": { "name": "High" },
-            "status": { "name": "Open" },
-            "category": { "name": "Fiber" },
-            "mode": { "name": "E-Mail" },
-            "subcategory": { "name": "Outage" },
-            "group": { "name": "App Development" },
-            "technician": { "name": "emillearns@gmail.com" },
-            "subject": "Test using Swagger",
-            "description": "Test ticket"
-          }
-        }
-      }
-    }
-  },
+  "host": "13.51.237.239:5000",
+  "basePath": "/api",
+  "schemes": ["http"],
   "paths": {
-    "/api/token": {
+    "/token": {
       "post": {
-        "summary": "Get Access Token from Keycloak",
-        "description": "Proxy request to Keycloak’s token endpoint. Use this to obtain a JWT token for other API calls.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/x-www-form-urlencoded": {
-              "schema": { "$ref": "#/components/schemas/KeycloakTokenRequest" }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Token retrieved successfully" },
-          "500": { "description": "Token error" }
-        }
-      }
-    },
-    "/api/v3/requests": {
-      "get": {
-        "summary": "List Zoho Requests",
-        "security": [{ "bearerAuth": [] }],
-        "responses": {
-          "200": { "description": "List of Zoho tickets" },
-          "401": { "description": "Unauthorized" }
-        }
-      },
-      "post": {
-        "summary": "Create a new Zoho Request",
-        "description": "Creates a new ticket in Zoho ServiceDesk.\n\n💡 **Important:** Prefer `application/json`. If using `application/x-www-form-urlencoded`, send `input_data={...}` as plain JSON (not URL-encoded).",
-        "security": [{ "bearerAuth": [] }],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/CreateRequest" }
-            },
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "input_data": { "$ref": "#/components/schemas/CreateRequest" }
-                },
-                "example": {
-                  "input_data": {
-                    "request": {
-                      "template": { "id": "228538000000542001" },
-                      "requester": { "name": "emillearns@gmail.com" },
-                      "subject": "Form Example Ticket",
-                      "description": "Form-based request"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Ticket created successfully" },
-          "400": { "description": "Invalid request or JSON parse error" },
-          "401": { "description": "Unauthorized" }
-        }
-      }
-    },
-    "/api/v3/requests/{id}": {
-      "get": {
-        "summary": "Get Request by ID",
-        "security": [{ "bearerAuth": [] }],
+        "summary": "Generate Access Token",
+        "description": "Obtain an OAuth2 access token using the client credentials flow.",
+        "consumes": ["application/x-www-form-urlencoded"],
+        "produces": ["application/json"],
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          {
+            "in": "formData",
+            "name": "grant_type",
+            "type": "string",
+            "required": true,
+            "default": "client_credentials",
+            "description": "OAuth2 grant type"
+          },
+          {
+            "in": "formData",
+            "name": "client_id",
+            "type": "string",
+            "required": true,
+            "default": "test",
+            "description": "Client ID issued by the authorization server"
+          },
+          {
+            "in": "formData",
+            "name": "client_secret",
+            "type": "string",
+            "required": true,
+            "default": "gm3NjSpvPeT1PyTjdZkQGi8UMuzrpmVl",
+            "description": "Client secret issued by the authorization server"
+          },
+          {
+            "in": "formData",
+            "name": "scope",
+            "type": "string",
+            "required": true,
+            "default": "tickets.read_only tickets.write",
+            "description": "Requested scopes"
+          }
         ],
         "responses": {
-          "200": { "description": "Request details" },
+          "200": { "description": "Access token generated successfully" },
+          "400": { "description": "Invalid request parameters" },
+          "401": { "description": "Unauthorized - Invalid client credentials" }
+        }
+      }
+    },
+    "/v3/requests": {
+      "get": {
+        "summary": "List Requests",
+        "description": "Retrieve a list of requests.",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "type": "string",
+            "required": true,
+            "default": "*/*",
+            "description": "Accepted response format"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "default": "Bearer <your-token>",
+            "description": "Bearer token for authentication"
+          }
+        ],
+        "responses": {
+          "200": { "description": "List of requests retrieved successfully" },
+          "401": { "description": "Unauthorized - Invalid token" }
+        }
+      },
+      "post": {
+        "summary": "Create Request",
+        "description": "Create a new request using a JSON payload wrapped in form-urlencoded format.",
+        "consumes": ["application/x-www-form-urlencoded"],
+        "produces": ["application/vnd.manageengine.sdp.v3+json"],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "input_data",
+            "description": "JSON string of request data",
+            "required": true,
+            "type": "string",
+            "schema": {
+              "$ref": "#/definitions/RequestSchema"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "description": "Bearer token for authentication",
+            "default": "Bearer <your-token>"
+          },
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string",
+            "required": true,
+            "default": "application/vnd.manageengine.sdp.v3+json"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Request created successfully" },
+          "400": { "description": "Bad Request - Invalid or missing input_data" },
+          "401": { "description": "Unauthorized - Invalid token" }
+        }
+      }
+    },
+    "/v3/requests/{request_id}": {
+      "get": {
+        "summary": "Get Request by ID",
+        "description": "Retrieve a specific request by its ID.",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The unique ID of the request to retrieve"
+          },
+          {
+            "in": "header",
+            "name": "accept",
+            "type": "string",
+            "required": true,
+            "default": "*/*"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "default": "Bearer <your-token>",
+            "description": "Bearer token for authentication"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Request details retrieved successfully" },
+          "401": { "description": "Unauthorized - Invalid token" },
           "404": { "description": "Request not found" }
         }
       },
       "put": {
-        "summary": "Update Request by ID",
-        "security": [{ "bearerAuth": [] }],
+        "summary": "Update Request",
+        "description": "Update an existing request by ID using a form-urlencoded JSON payload.",
+        "consumes": ["application/x-www-form-urlencoded"],
+        "produces": ["application/vnd.manageengine.sdp.v3+json"],
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/CreateRequest" } }
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The unique ID of the request to update"
+          },
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string",
+            "required": true,
+            "default": "application/vnd.manageengine.sdp.v3+json"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "description": "Bearer token for authentication",
+            "default": "Bearer <your-token>"
+          },
+          {
+            "in": "formData",
+            "name": "input_data",
+            "required": true,
+            "type": "string",
+            "schema": {
+              "$ref": "#/definitions/RequestSchema"
+            },
+            "description": "JSON string of updated request data"
           }
-        },
+        ],
         "responses": {
           "200": { "description": "Request updated successfully" },
-          "400": { "description": "Invalid input" }
+          "400": { "description": "Bad Request - Invalid or missing input_data" },
+          "401": { "description": "Unauthorized - Invalid token" },
+          "404": { "description": "Request not found" }
         }
       }
     },
-    "/api/v3/requests/{id}/_uploads": {
+    "/v3/requests/{request_id}/_uploads": {
       "post": {
-        "summary": "Upload Attachment",
-        "security": [{ "bearerAuth": [] }],
+        "summary": "Upload Attachments to a Request",
+        "description": "Upload one or more attachment files to a specific request.",
+        "consumes": ["multipart/form-data"],
+        "produces": ["application/vnd.manageengine.sdp.v3+json"],
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The unique ID of the request to upload files to"
+          },
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string",
+            "required": true,
+            "default": "application/vnd.manageengine.sdp.v3+json"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "default": "Bearer <your-token>",
+            "description": "Bearer token for authentication"
+          },
+          {
+            "in": "formData",
+            "name": "filename",
+            "type": "file",
+            "required": true,
+            "description": "Files to upload",
+            "x-multi-files": true
+          },
+          {
+            "in": "formData",
+            "name": "addtoattachment",
+            "type": "string",
+            "required": false,
+            "default": "true",
+            "description": "Whether to add the uploaded file(s) as attachments"
+          }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "filename": {
-                    "type": "string",
-                    "format": "binary",
-                    "description": "File to upload"
-                  },
-                  "addtoattachment": {
-                    "type": "string",
-                    "example": "true"
-                  }
-                },
-                "required": ["filename"]
-              }
-            }
-          }
-        },
         "responses": {
-          "200": { "description": "Attachment uploaded" },
-          "400": { "description": "Invalid input" },
-          "401": { "description": "Unauthorized" }
-        }
-      }
-    },
-    "/api/health": {
-      "get": {
-        "summary": "Health Check",
-        "description": "Check if proxy service is up.",
-        "responses": {
-          "200": {
-            "description": "Service is healthy",
-            "content": {
-              "application/json": {
-                "example": { "status": "ok", "message": "Proxy service running" }
-              }
-            }
-          }
+          "200": { "description": "File(s) uploaded successfully" },
+          "400": { "description": "Bad Request - Invalid or missing file(s)" },
+          "401": { "description": "Unauthorized - Invalid token" },
+          "404": { "description": "Request not found" }
         }
       }
     }
   },
-  "security": [{ "bearerAuth": [] }]
+  "definitions": {
+    "RequestSchema": {
+      "type": "object",
+      "properties": {
+        "request": {
+          "type": "object",
+          "properties": {
+            "template": { "type": "object", "properties": { "id": { "type": "string" } } },
+            "request_template_task_ids": { "type": "array", "items": { "type": "string" } },
+            "requester": { "type": "object", "properties": { "name": { "type": "string" } } },
+            "site": { "type": "object", "properties": { "name": { "type": "string" } } },
+            "request_type": { "type": "object", "properties": { "name": { "type": "string" } } },
+            "priority": { "type": "object", "properties": { "name": { "type": "string" } } },
+            "status": { "type": "object", "properties": { "name": { "type": "string" } } },
+            "category": { "type": "object", "properties": { "name": { "type": "string" } } },
+            "mode": { "type": "object", "properties": { "name": { "type": "string" } } },
+            "subcategory": { "type": "object", "properties": { "name": { "type": "string" } } },
+            "group": { "type": "object", "properties": { "name": { "type": "string" } } },
+            "technician": { "type": "object", "properties": { "name": { "type": "string" } } },
+            "udf_fields": {
+              "type": "object",
+              "properties": {
+                "udf_char21": { "type": "string" },
+                "udf_char27": { "type": "string" },
+                "udf_char22": { "type": "string" },
+                "udf_char23": { "type": "string" },
+                "udf_char24": { "type": "string" },
+                "udf_char26": { "type": "string" }
+              }
+            },
+            "subject": { "type": "string" },
+            "description": { "type": "string" },
+            "attachments": { "type": "array", "items": { "type": "string" } },
+            "resolution": { "type": "object", "properties": { "content": { "type": "string" } } }
+          }
+        }
+      }
+    }
+  }
 }

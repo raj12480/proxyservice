@@ -270,7 +270,7 @@ def handle_exception(e):
 
 @app.route('/api/docs')
 def swagger_json():
-    return send_file('swagger_test.json')
+    return send_file('swagger.json')
 
 @app.route('/')
 def swagger_ui():
