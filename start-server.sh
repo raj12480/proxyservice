@@ -1,12 +1,9 @@
 #!/bin/sh
 
 export FLASK_KEYCLOAK_AUTH_URL="http://13.51.237.239:8080/realms/service_desk"
-export FLASK_ZOHO_CLIENT_ID="1000.J8GE18WSCEK2YDUQ4WZMWMYEP8HPVS"
-export FLASK_ZOHO_CLIENT_SECRET="d1d9fe6501f89be52082309376a4d924376d32da36"
+export FLASK_ZOHO_CLIENT_ID="1000.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+export FLASK_ZOHO_CLIENT_SECRET="xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
-
-#export FLASK_ZOHO_CLIENT_ID="1000.W2JC936IJ8CYROPR4VCLNOCBU51XBC"
-#export FLASK_ZOHO_CLIENT_SECRET="faf99b00ecacab08bc635b5f5e1df9301dc5795dd1"
 
 #gunicorn
 exec gunicorn app:app \
