@@ -298,7 +298,7 @@ def list_categories():
 @app.get('/api/v3/categories/by-name/<category_name>')
 @require_keycloak(['tickets.read_only', 'tickets.write'])
 def get_category_by_name(category_name):
-    """Get category ID by category name"""
+    """Get category ID by category name (case-insensitive)"""
     scope = "SDPOnDemand.setup.READ"
     token = get_token(scope)
     access_token = token['access_token']
@@ -317,9 +317,13 @@ def get_category_by_name(category_name):
     except Exception:
         return jsonify({'error': 'Failed to parse categories', 'response': resp.text}), 500
 
-    # Search for the category with exact name match
+    # Normalize input for case-insensitive search
+    search_name = category_name.lower()
+
+    # Search for the category with case-insensitive match
     for cat in categories:
-        if cat.get('name') == category_name:
+        cat_name = cat.get('name', '').lower()
+        if cat_name == search_name:
             return jsonify({'category_id': cat.get('id'), 'name': cat.get('name')}), 200
 
     return jsonify({'error': 'Category not found', 'name': category_name}), 404

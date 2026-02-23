@@ -1,0 +1,245 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "3.0",
+    "title": "ManageEngine ServiceDesk Plus API"
+  },
+  "host": "16.171.240.250:5000",
+  "basePath": "/api",
+  "schemes": ["http"],
+  "paths": {
+    "/token": {
+      "post": {
+        "summary": "Generate Access Token",
+        "description": "Obtain an OAuth2 access token using the client credentials flow.",
+        "consumes": ["application/x-www-form-urlencoded"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "grant_type",
+            "type": "string",
+            "required": true,
+            "default": "client_credentials"
+          },
+          {
+            "in": "formData",
+            "name": "client_id",
+            "type": "string",
+            "required": true,
+            "default": "test"
+          },
+          {
+            "in": "formData",
+            "name": "client_secret",
+            "type": "string",
+            "required": true,
+            "default": "3TIv48fgimJV8oYpsKC18kSilVTcJz5V"
+          },
+          {
+            "in": "formData",
+            "name": "scope",
+            "type": "string",
+            "required": true,
+            "default": "tickets.read_only tickets.write"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Access token generated successfully" },
+          "400": { "description": "Invalid request parameters" },
+          "401": { "description": "Unauthorized - Invalid client credentials" }
+        }
+      }
+    },
+
+    "/v3/categories": {
+      "post": {
+        "summary": "Create Category",
+        "description": "Create a new category in ServiceDesk Plus.",
+        "consumes": ["application/x-www-form-urlencoded"],
+        "produces": ["application/vnd.manageengine.sdp.v3+json"],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "input_data",
+            "required": true,
+            "type": "string",
+            "description": "JSON string containing category data"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "default": "Bearer <your-token>"
+          },
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string",
+            "required": true,
+            "default": "application/vnd.manageengine.sdp.v3+json"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Category created successfully" },
+          "400": { "description": "Bad Request - Invalid or missing input_data" },
+          "401": { "description": "Unauthorized - Invalid token" }
+        }
+      }
+    },
+
+    "/v3/categories/{category_id}/subcategories": {
+      "post": {
+        "summary": "Create Sub-Category",
+        "description": "Create a new sub-category under a specific category.",
+        "consumes": ["application/x-www-form-urlencoded"],
+        "produces": ["application/vnd.manageengine.sdp.v3+json"],
+        "parameters": [
+          {
+            "name": "category_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Parent Category ID"
+          },
+          {
+            "in": "formData",
+            "name": "input_data",
+            "required": true,
+            "type": "string",
+            "description": "JSON string containing sub-category data"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "default": "Bearer <your-token>"
+          },
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string",
+            "required": true,
+            "default": "application/vnd.manageengine.sdp.v3+json"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Sub-category created successfully" },
+          "400": { "description": "Bad Request - Invalid or missing input_data" },
+          "401": { "description": "Unauthorized - Invalid token" },
+          "404": { "description": "Category not found" }
+        }
+      }
+    },
+
+    "/v3/requests": {
+      "get": {
+        "summary": "List Requests",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "accept",
+            "type": "string",
+            "required": true,
+            "default": "*/*"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "default": "Bearer <your-token>"
+          }
+        ],
+        "responses": {
+          "200": { "description": "List of requests retrieved successfully" },
+          "401": { "description": "Unauthorized - Invalid token" }
+        }
+      },
+      "post": {
+        "summary": "Create Request",
+        "consumes": ["application/x-www-form-urlencoded"],
+        "produces": ["application/vnd.manageengine.sdp.v3+json"],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "input_data",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true
+          },
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string",
+            "required": true,
+            "default": "application/vnd.manageengine.sdp.v3+json"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Request created successfully" }
+        }
+      }
+    },
+
+    "/v3/requests/{request_id}": {
+      "get": {
+        "summary": "Get Request by ID",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": { "description": "Request details retrieved successfully" }
+        }
+      },
+      "put": {
+        "summary": "Update Request",
+        "consumes": ["application/x-www-form-urlencoded"],
+        "produces": ["application/vnd.manageengine.sdp.v3+json"],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "formData",
+            "name": "input_data",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": { "description": "Request updated successfully" }
+        }
+      }
+    }
+  }
+}
