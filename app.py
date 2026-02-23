@@ -286,6 +286,13 @@ def create_subcategory(category_id):
     return proxy_zoho_api(scope)
 
 
+@app.get('/api/v3/categories')
+@require_keycloak(['tickets.read_only', 'tickets.write'])
+def list_categories():
+    """Get list of all categories"""
+    scope = "SDPOnDemand.setup.READ"
+    return proxy_zoho_api(scope)
+
 """--- Rest APIs end ---"""
 
 @app.route('/api/docs')

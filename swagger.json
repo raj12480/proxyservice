@@ -15,34 +15,10 @@
         "consumes": ["application/x-www-form-urlencoded"],
         "produces": ["application/json"],
         "parameters": [
-          {
-            "in": "formData",
-            "name": "grant_type",
-            "type": "string",
-            "required": true,
-            "default": "client_credentials"
-          },
-          {
-            "in": "formData",
-            "name": "client_id",
-            "type": "string",
-            "required": true,
-            "default": "test"
-          },
-          {
-            "in": "formData",
-            "name": "client_secret",
-            "type": "string",
-            "required": true,
-            "default": "3TIv48fgimJV8oYpsKC18kSilVTcJz5V"
-          },
-          {
-            "in": "formData",
-            "name": "scope",
-            "type": "string",
-            "required": true,
-            "default": "tickets.read_only tickets.write"
-          }
+          {"in": "formData","name": "grant_type","type": "string","required": true,"default": "client_credentials"},
+          {"in": "formData","name": "client_id","type": "string","required": true,"default": "test"},
+          {"in": "formData","name": "client_secret","type": "string","required": true,"default": "3TIv48fgimJV8oYpsKC18kSilVTcJz5V"},
+          {"in": "formData","name": "scope","type": "string","required": true,"default": "tickets.read_only tickets.write"}
         ],
         "responses": {
           "200": { "description": "Access token generated successfully" },
@@ -53,6 +29,24 @@
     },
 
     "/v3/categories": {
+      "get": {
+        "summary": "List Categories",
+        "description": "Retrieve all categories.",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "default": "Bearer <your-token>"
+          }
+        ],
+        "responses": {
+          "200": { "description": "List of categories retrieved successfully" },
+          "401": { "description": "Unauthorized - Invalid token" }
+        }
+      },
       "post": {
         "summary": "Create Category",
         "description": "Create a new category in ServiceDesk Plus.",
@@ -139,20 +133,8 @@
         "summary": "List Requests",
         "produces": ["application/json"],
         "parameters": [
-          {
-            "in": "header",
-            "name": "accept",
-            "type": "string",
-            "required": true,
-            "default": "*/*"
-          },
-          {
-            "in": "header",
-            "name": "Authorization",
-            "type": "string",
-            "required": true,
-            "default": "Bearer <your-token>"
-          }
+          {"in": "header","name": "accept","type": "string","required": true,"default": "*/*"},
+          {"in": "header","name": "Authorization","type": "string","required": true,"default": "Bearer <your-token>"}
         ],
         "responses": {
           "200": { "description": "List of requests retrieved successfully" },
@@ -164,25 +146,9 @@
         "consumes": ["application/x-www-form-urlencoded"],
         "produces": ["application/vnd.manageengine.sdp.v3+json"],
         "parameters": [
-          {
-            "in": "formData",
-            "name": "input_data",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "in": "header",
-            "name": "Authorization",
-            "type": "string",
-            "required": true
-          },
-          {
-            "in": "header",
-            "name": "Accept",
-            "type": "string",
-            "required": true,
-            "default": "application/vnd.manageengine.sdp.v3+json"
-          }
+          {"in": "formData","name": "input_data","required": true,"type": "string"},
+          {"in": "header","name": "Authorization","type": "string","required": true},
+          {"in": "header","name": "Accept","type": "string","required": true,"default": "application/vnd.manageengine.sdp.v3+json"}
         ],
         "responses": {
           "200": { "description": "Request created successfully" }
@@ -195,18 +161,8 @@
         "summary": "Get Request by ID",
         "produces": ["application/json"],
         "parameters": [
-          {
-            "name": "request_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "in": "header",
-            "name": "Authorization",
-            "type": "string",
-            "required": true
-          }
+          {"name": "request_id","in": "path","required": true,"type": "string"},
+          {"in": "header","name": "Authorization","type": "string","required": true}
         ],
         "responses": {
           "200": { "description": "Request details retrieved successfully" }
@@ -217,24 +173,9 @@
         "consumes": ["application/x-www-form-urlencoded"],
         "produces": ["application/vnd.manageengine.sdp.v3+json"],
         "parameters": [
-          {
-            "name": "request_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "in": "formData",
-            "name": "input_data",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "in": "header",
-            "name": "Authorization",
-            "type": "string",
-            "required": true
-          }
+          {"name": "request_id","in": "path","required": true,"type": "string"},
+          {"in": "formData","name": "input_data","required": true,"type": "string"},
+          {"in": "header","name": "Authorization","type": "string","required": true}
         ],
         "responses": {
           "200": { "description": "Request updated successfully" }
