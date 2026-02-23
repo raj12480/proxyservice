@@ -83,6 +83,35 @@
       }
     },
 
+    "/v3/categories/by-name/{category_name}": {
+      "get": {
+        "summary": "Get Category by Name",
+        "description": "Retrieve category ID by providing the category name.",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "category_name",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Exact name of the category"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "default": "Bearer <your-token>"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Category found and returned successfully" },
+          "404": { "description": "Category not found" },
+          "401": { "description": "Unauthorized - Invalid token" }
+        }
+      }
+    },
+
     "/v3/categories/{category_id}/subcategories": {
       "post": {
         "summary": "Create Sub-Category",

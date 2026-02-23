@@ -293,6 +293,38 @@ def list_categories():
     scope = "SDPOnDemand.setup.READ"
     return proxy_zoho_api(scope)
 
+
+
+@app.get('/api/v3/categories/by-name/<category_name>')
+@require_keycloak(['tickets.read_only', 'tickets.write'])
+def get_category_by_name(category_name):
+    """Get category ID by category name"""
+    scope = "SDPOnDemand.setup.READ"
+    token = get_token(scope)
+    access_token = token['access_token']
+
+    # Zoho API URL for categories
+    base_url = "https://sdpondemand.manageengine.com/app/itdesk/api/v3/categories"
+
+    headers = {
+        'Authorization': f'Zoho-oauthtoken {access_token}',
+        'Accept': 'application/vnd.manageengine.sdp.v3+json'
+    }
+
+    resp = requests.get(base_url, headers=headers)
+    try:
+        categories = resp.json().get('categories', [])
+    except Exception:
+        return jsonify({'error': 'Failed to parse categories', 'response': resp.text}), 500
+
+    # Search for the category with exact name match
+    for cat in categories:
+        if cat.get('name') == category_name:
+            return jsonify({'category_id': cat.get('id'), 'name': cat.get('name')}), 200
+
+    return jsonify({'error': 'Category not found', 'name': category_name}), 404
+
+
 """--- Rest APIs end ---"""
 
 @app.route('/api/docs')
