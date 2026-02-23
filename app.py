@@ -266,6 +266,26 @@ def handle_exception(e):
     response.content_type = "application/json"
     return response
 
+
+@app.post('/api/v3/categories')
+@require_keycloak('tickets.write')
+def create_category():
+    """Create a new category"""
+
+    scope = "SDPOnDemand.setup.WRITE"
+    return proxy_zoho_api(scope)
+
+
+
+@app.post('/api/v3/categories/<category_id>/subcategories')
+@require_keycloak('tickets.write')
+def create_subcategory(category_id):
+    """Create a new sub-category under a category"""
+
+    scope = "SDPOnDemand.setup.WRITE"
+    return proxy_zoho_api(scope)
+
+
 """--- Rest APIs end ---"""
 
 @app.route('/api/docs')
